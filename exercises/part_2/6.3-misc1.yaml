@@ -1,0 +1,47 @@
+# Author: Lorenzo Bevilacqua
+# Description: Try out what you learnied by doing the edits described below. Some motions not yet mentioned:
+#   0: move to the beginning of the line
+#   ^: move at the beginning of the text
+#   $: move to the end of the line
+#
+#   Note: usually C and D correspond respectively to c$ and d$, this is not the case for
+#     Y, which for some reason has the same functionality as yy.
+# Objective: Try out the differences between 0 and ^;
+#   Substitute the traefik version with v4.2.0;
+#   Populate with some value the declared variables (can be random, just for practice);
+#   Rename the network (proxy) and the volume (certs) with something else;
+#   We can't afford certificates, remove every option regarding https and tls.
+
+services:
+  traefik:
+    image: traefik:v3.1.2
+    environment:
+      CF_API_EMAIL: ${CF_API_EMAIL}
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+    networks:
+      - proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yaml:/etc/traefik/traefik.yaml:ro
+      - ./config:/config:ro
+      - ${LOG_PATH:-/var/log/traefik}:/logs:rw
+      - certs:/certs
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    labels:
+      hostname: traefik
+      traefik.enable: true
+      traefik.http.routers.traefik.entrypoints: https
+      traefik.http.routers.traefik.service: api@internal
+      traefik.http.routers.traefik.tls.certresolver: lets-encrypt
+      traefik.http.routers.traefik.tls.domains[0].main: ${BASE_FQDN}
+      traefik.http.routers.traefik.tls.domains[0].sans: "*.${BASE_FQDN}"
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  certs:
