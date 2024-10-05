@@ -1,5 +1,7 @@
 # Vim basics, your first steps to Modal editing
 
+[Slides](https://docs.google.com/presentation/d/19xvvuHJ-q5CV0kdYAB1S1uhLRUMxInbl0H-UUbn3yPA/edit?usp=sharing)
+
 ## Abstract
 
 This is the perfect workshop for anyone looking to finally dive into Vim and master
